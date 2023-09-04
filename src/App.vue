@@ -1,8 +1,9 @@
 <script setup>
+import WsTestView from "@/components/views/WsTestView.vue";
 </script>
 
 <template>
-<h1>Hello</h1>
+  <WsTestView/>
 </template>
 
 <style scoped>

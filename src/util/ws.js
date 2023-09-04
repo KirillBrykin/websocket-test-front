@@ -1,13 +1,18 @@
 import {Client} from '@stomp/stompjs';
+import {ref} from "vue";
+import {useToast} from "vue-toast-notification";
+
+const $toast = useToast();
+export const messageFromBackList = ref([])
 
 const stompClient = new Client({
     brokerURL: 'ws://192.168.0.31:8082/events',
     onConnect: (frame) => {
         console.log('Connected: ' + frame)
-        stompClient.subscribe('/topic/events', message => {
-            console.log('Received message: ' + message)
-            console.log('Received message.body: ' + message.body)
-            console.log(`Received test: ${message.body}`)
+        stompClient.subscribe('/topic/messageFromBack', message => {
+            console.log(`Received message: ${message}`)
+            $toast.success("Received message from backend")
+            saveMessage(message.body)
         });
     },
     onWebSocketError: (error) => {
@@ -21,4 +26,16 @@ const stompClient = new Client({
 
 export function connect() {
     stompClient.activate()
+}
+
+export function sendMessage(message) {
+    console.log(`Send message: ` + message)
+    stompClient.publish({
+        destination: "/app/messageFromFront",
+        body: JSON.stringify(message)
+    });
+}
+
+export function saveMessage(message) {
+    messageFromBackList.value.push(message)
 }
